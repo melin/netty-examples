@@ -9,8 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ustcinfo.rpc.client.AbstractClientFactory;
 import com.ustcinfo.rpc.client.Client;
@@ -19,9 +19,8 @@ import com.ustcinfo.rpc.netty4.serialize.Netty4ProtocolEncoder;
 
 public class Netty4ClientFactory extends AbstractClientFactory {
 
-	private static final Log LOGGER = LogFactory
-			.getLog(Netty4ClientFactory.class);
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(Netty4ClientFactory.class);
+			
 	private static AbstractClientFactory _self = new Netty4ClientFactory();
 
 	private Netty4ClientFactory() {
@@ -39,17 +38,10 @@ public class Netty4ClientFactory extends AbstractClientFactory {
 		Bootstrap b = new Bootstrap();
 		b.group(group)
 		 .channel(NioSocketChannel.class)
-		 .option(
-		 		ChannelOption.TCP_NODELAY,
-		 		Boolean.parseBoolean(System.getProperty(
-		 				"nfs.rpc.tcp.nodelay", "true")))
-		 .option(
-		 		ChannelOption.SO_REUSEADDR,
-		 		Boolean.parseBoolean(System.getProperty(
-		 				"nfs.rpc.tcp.reuseaddress", "true")))
-	     .option(
-		 		ChannelOption.CONNECT_TIMEOUT_MILLIS,
-		 		connectTimeout < 1000 ? 1000 : connectTimeout)
+		 .option(ChannelOption.TCP_NODELAY, Boolean.parseBoolean(System.getProperty("nfs.rpc.tcp.nodelay", "true")))
+		 .option(ChannelOption.SO_REUSEADDR, Boolean.parseBoolean(System.getProperty("nfs.rpc.tcp.reuseaddress", "true")))
+	     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout < 1000 ? 1000 : connectTimeout)
+	     
          .handler(new ChannelInitializer<SocketChannel>() {
              @Override
              public void initChannel(SocketChannel ch) throws Exception {
@@ -63,22 +55,16 @@ public class Netty4ClientFactory extends AbstractClientFactory {
 
 		future.awaitUninterruptibly(connectTimeout);
 		if (!future.isDone()) {
-			LOGGER.error("Create connection to " + targetIP + ":" + targetPort
-					+ " timeout!");
-			throw new Exception("Create connection to " + targetIP + ":"
-					+ targetPort + " timeout!");
+			LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " timeout!");
+			throw new Exception("Create connection to " + targetIP + ":" + targetPort + " timeout!");
 		}
 		if (future.isCancelled()) {
-			LOGGER.error("Create connection to " + targetIP + ":" + targetPort
-					+ " cancelled by user!");
-			throw new Exception("Create connection to " + targetIP + ":"
-					+ targetPort + " cancelled by user!");
+			LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " cancelled by user!");
+			throw new Exception("Create connection to " + targetIP + ":" + targetPort + " cancelled by user!");
 		}
 		if (!future.isSuccess()) {
-			LOGGER.error("Create connection to " + targetIP + ":" + targetPort
-					+ " error", future.cause());
-			throw new Exception("Create connection to " + targetIP + ":"
-					+ targetPort + " error", future.cause());
+			LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " error", future.cause());
+			throw new Exception("Create connection to " + targetIP + ":" + targetPort + " error", future.cause());
 		}
 		Netty4Client client = new Netty4Client(future, key, connectTimeout);
 		handler.setClient(client);

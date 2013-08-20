@@ -13,20 +13,16 @@ public abstract class AbstractClientFactory implements ClientFactory {
 	private static ConcurrentHashMap<String, FutureTask<List<Client>>> clients = 
 		new ConcurrentHashMap<String, FutureTask<List<Client>>>();
 	
-	private static boolean isSendLimitEnabled = false;
-
 	public Client get(final String targetIP, final int targetPort,
-			final int connectTimeout, String... customKey) throws Exception {
-		return get(targetIP, targetPort, connectTimeout, 1, customKey);
+			final int connectTimeout) throws Exception {
+		return get(targetIP, targetPort, connectTimeout, 1);
 	}
 
 	public Client get(final String targetIP, final int targetPort,
-			final int connectTimeout, final int clientNums, String... customKey)
+			final int connectTimeout, final int clientNums)
 			throws Exception {
 		String key = targetIP + ":" + targetPort;
-		if (customKey != null && customKey.length == 1) {
-			key = customKey[0];
-		}
+
 		if (clients.containsKey(key)) {
 			if (clientNums == 1) {
 				return clients.get(key).get().get(0);
@@ -65,56 +61,12 @@ public abstract class AbstractClientFactory implements ClientFactory {
 		}
 	}
 
-	public void removeClient(String key, Client client) {
+	public void removeClient(String key) {
 		try {
-			// TODO: Fix It
 			clients.remove(key);
-//			clients.get(key).get().remove(client);
-//			clients.get(key)
-//					.get()
-//					.add(createClient(client.getServerIP(),
-//							client.getServerPort(), client.getConnectTimeout(),
-//							key));
 		} catch (Exception e) {
 			// IGNORE
 		}
-	}
-	
-	public void enableSendLimit(){
-		isSendLimitEnabled = true;
-	}
-	
-	/**
-	 * check if sending bytes size exceed limit threshold
-	 */
-	public void checkSendLimit() throws Exception{
-		if(!isSendLimitEnabled)
-			return;
-		long threshold =  javaHeapSize * sendLimitPercent / 100;
-		long sendingBytesSize = getSendingBytesSize();
-		if(sendingBytesSize >= threshold){
-			if(sendLimitPolicy == SendLimitPolicy.REJECT){
-				throw new Exception("sending bytes size exceed threshold,size: "+sendingBytesSize+", threshold: "+threshold);
-			}
-			else{
-				Thread.sleep(1000);
-				sendingBytesSize = getSendingBytesSize();
-				if(sendingBytesSize >= threshold){
-					throw new Exception("sending bytes size exceed threshold,size: "+sendingBytesSize+", threshold: "+threshold);
-				}
-			}
-		}
-	}
-	
-	private long getSendingBytesSize() throws Exception{
-		long sendingBytesSize = 0;
-		for (FutureTask<List<Client>> clientListTask : clients.values()) {
-			List<Client> clientList = clientListTask.get();
-			for (Client client : clientList) {
-				sendingBytesSize += client.getSendingBytesSize();
-			}
-		}
-		return sendingBytesSize;
 	}
 
 	public static ClientFactory getInstance() {

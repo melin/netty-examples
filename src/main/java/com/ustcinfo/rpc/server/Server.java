@@ -5,7 +5,6 @@ package com.ustcinfo.rpc.server;
  *   
  *   http://code.google.com/p/nfs-rpc (c) 2011
  */
-import java.util.concurrent.ExecutorService;
 /**
  * RPC Server Interface
  * 
@@ -16,7 +15,7 @@ public interface Server {
 	/**
 	 * start server at listenPort,requests will be handled in businessThreadPool
 	 */
-	public void start(int listenPort,ExecutorService businessThreadPool) throws Exception;
+	public void start(int listenPort) throws Exception;
 	
 	/**
 	 * register business handler

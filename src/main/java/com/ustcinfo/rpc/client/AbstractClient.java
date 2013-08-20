@@ -1,6 +1,5 @@
 package com.ustcinfo.rpc.client;
 
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +11,6 @@ import com.ustcinfo.rpc.Codecs;
 import com.ustcinfo.rpc.RequestWrapper;
 import com.ustcinfo.rpc.ResponseWrapper;
 
-/**
- * Common Client,support sync invoke
- * 
- * @author <a href="mailto:bluedavy@gmail.com">bluedavy</a>
- */
 public abstract class AbstractClient implements Client {
 
 	private static final Log LOGGER = LogFactory.getLog(AbstractClient.class);
@@ -31,17 +25,12 @@ public abstract class AbstractClient implements Client {
 	protected static ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>> responses = 
 			new ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>>();
 	
-	public Object invokeSync(Object message, int timeout, int codecType) throws Exception {
-		RequestWrapper wrapper = new RequestWrapper(message, timeout, codecType);
-		return invokeSyncIntern(wrapper);
-	}
-
 	public Object invokeSync(String targetInstanceName, String methodName,
-			String[] argTypes, Object[] args, int timeout, int codecType)
+			Class<?>[] argTypes, Object[] args, int timeout, int codecType)
 			throws Exception {
 		byte[][] argTypeBytes = new byte[argTypes.length][];
 		for(int i =0; i < argTypes.length; i++) {
-		    argTypeBytes[i] =  argTypes[i].getBytes();
+		    argTypeBytes[i] =  argTypes[i].getName().getBytes();
 		}
 		RequestWrapper wrapper = new RequestWrapper(targetInstanceName.getBytes(),
 				methodName.getBytes(), argTypeBytes, args, timeout, codecType);
@@ -58,7 +47,6 @@ public abstract class AbstractClient implements Client {
 				// for performance trace
 				LOGGER.debug("client ready to send message,request id: "+wrapper.getId());
 			}
-			getClientFactory().checkSendLimit();
 			sendRequest(wrapper, wrapper.getTimeout());
 			if(isDebugEnabled){
 				// for performance trace
@@ -103,20 +91,7 @@ public abstract class AbstractClient implements Client {
 		
 		if(result instanceof ResponseWrapper){
 			responseWrapper = (ResponseWrapper) result;
-		}
-		else if(result instanceof List){
-			@SuppressWarnings("unchecked")
-			List<ResponseWrapper> responseWrappers = (List<ResponseWrapper>) result;
-			for (ResponseWrapper response : responseWrappers) {
-				if(response.getRequestId() == wrapper.getId()){
-					responseWrapper = response;
-				}
-				else{
-					putResponse(response);
-				}
-			}
-		}
-		else{
+		} else {
 			throw new Exception("only receive ResponseWrapper or List as response");
 		}
 		try{
@@ -178,32 +153,6 @@ public abstract class AbstractClient implements Client {
 		} 
 		catch (InterruptedException e) {
 			LOGGER.error("put response error,request id is:" + wrapper.getRequestId(), e);
-		}
-	}
-	
-	/**
-	 * receive responses
-	 */
-	public void putResponses(List<ResponseWrapper> wrappers) throws Exception {
-		for (ResponseWrapper wrapper : wrappers) {
-			if (!responses.containsKey(wrapper.getRequestId())) {
-				LOGGER.warn("give up the response,request id is:" + wrapper.getRequestId() + ",maybe because timeout!");
-				continue;
-			}
-			try {
-				ArrayBlockingQueue<Object> queue = responses.get(wrapper.getRequestId());
-				if (queue != null) {
-					queue.put(wrappers);
-					break;
-				} 
-				else {
-					LOGGER.warn("give up the response,request id is:"
-							+ wrapper.getRequestId() + ",because queue is null");
-				}
-			} 
-			catch (InterruptedException e) {
-				LOGGER.error("put response error,request id is:" + wrapper.getRequestId(), e);
-			}
 		}
 	}
 

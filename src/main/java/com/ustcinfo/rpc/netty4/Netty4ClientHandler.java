@@ -34,14 +34,13 @@ public class Netty4ClientHandler extends SimpleChannelInboundHandler<Object> {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
 		if (!(cause instanceof IOException)) {
-			// only log
 			LOGGER.error("catch some exception not IOException", cause);
 		}
 	}
 
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		LOGGER.warn("connection closed: " + ctx.channel().remoteAddress());
-		factory.removeClient(key, client);
+		factory.removeClient(key);
 	}
 
 	@Override

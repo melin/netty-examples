@@ -1,23 +1,8 @@
 package com.ustcinfo.rpc.client;
 
-import java.util.List;
-
 import com.ustcinfo.rpc.ResponseWrapper;
 
 public interface Client {
-
-	/**
-	 * invoke sync via simple call
-	 * 
-	 * @param message
-	 * @param timeout
-	 * @param codecType serialize/deserialize type
-	 * @param protocolType
-	 * @return Object
-	 * @throws Exception
-	 */
-	public Object invokeSync(Object message, int timeout, int codecType)
-			throws Exception;
 
 	/**
 	 * invoke sync via rpc
@@ -40,18 +25,13 @@ public interface Client {
 	 *             if some exception,then will be throwed
 	 */
 	public Object invokeSync(String targetInstanceName, String methodName,
-			String[] argTypes, Object[] args, int timeout, int codecType)
+			Class<?>[] argTypes, Object[] args, int timeout, int codecType)
 			throws Exception;
 
 	/**
 	 * receive response from server
 	 */
 	public void putResponse(ResponseWrapper response) throws Exception;
-	
-	/**
-	 * receive responses from server
-	 */
-	public void putResponses(List<ResponseWrapper> responses) throws Exception;
 	
 	/**
 	 * server address
@@ -73,13 +53,6 @@ public interface Client {
 	 * @return
 	 */
 	public int getConnectTimeout();
-	
-	/**
-	 * get sending bytes size
-	 * 
-	 * @return long
-	 */
-	public long getSendingBytesSize();
 	
 	/**
 	 * Get factory

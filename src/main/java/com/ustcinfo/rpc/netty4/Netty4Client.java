@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import com.ustcinfo.rpc.RequestWrapper;
 import com.ustcinfo.rpc.ResponseWrapper;
 import com.ustcinfo.rpc.client.AbstractClient;
-import com.ustcinfo.rpc.client.Client;
 import com.ustcinfo.rpc.client.ClientFactory;
 
 public class Netty4Client extends AbstractClient {
@@ -33,7 +32,6 @@ public class Netty4Client extends AbstractClient {
 	public void sendRequest(final RequestWrapper wrapper, final int timeout)
 			throws Exception {
 		final long beginTime = System.currentTimeMillis();
-		final Client self = this;
 		ChannelFuture writeFuture = cf.channel().writeAndFlush(wrapper);
 		// use listener to avoid wait for write & thread context switch
 		writeFuture.addListener(new ChannelFutureListener() {
@@ -60,7 +58,7 @@ public class Netty4Client extends AbstractClient {
 						cf.channel().close();
 					} 
 					else {
-						Netty4ClientFactory.getInstance().removeClient(key, self);
+						Netty4ClientFactory.getInstance().removeClient(key);
 					}
 					errorMsg = "Send request to " + cf.channel().toString()
 							+ " error" + future.cause();
@@ -68,7 +66,6 @@ public class Netty4Client extends AbstractClient {
 				LOGGER.error(errorMsg);
 				ResponseWrapper response = new ResponseWrapper(wrapper.getId(), wrapper.getCodecType());
 				response.setException(new Exception(errorMsg));
-				self.putResponse(response);
 			}
 		});
 	}

@@ -9,7 +9,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
@@ -34,7 +33,7 @@ public class Netty4Server implements Server {
 		this.businessThreads = businessThreads;
 	}
 
-	public void start(int listenPort, final ExecutorService ignore)
+	public void start(int listenPort)
 	        throws Exception {
 		if (!startFlag.compareAndSet(false, true)) {
 			return;
@@ -65,7 +64,7 @@ public class Netty4Server implements Server {
 		        });
 
 		b.bind(listenPort).sync();
-		LOGGER.warn("Server started,listen at: " + listenPort + ", businessThreads is " + businessThreads);
+		LOGGER.info("Server started,listen at: " + listenPort + ", businessThreads is " + businessThreads);
 	}
 
 	public void registerProcessor(String serviceName, Object serviceInstance) {
