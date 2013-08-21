@@ -1,6 +1,7 @@
 package com.ustcinfo.rpc.client;
 
 import com.ustcinfo.rpc.ResponseWrapper;
+import com.ustcinfo.rpc.annotation.Codecs;
 
 public interface Client {
 
@@ -25,7 +26,7 @@ public interface Client {
 	 *             if some exception,then will be throwed
 	 */
 	public Object invokeSync(String targetInstanceName, String methodName,
-			Class<?>[] argTypes, Object[] args, int timeout, int codecType)
+			Class<?>[] argTypes, Object[] args, int timeout, Codecs codecType)
 			throws Exception;
 
 	/**

@@ -2,6 +2,8 @@ package com.ustcinfo.rpc;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ustcinfo.rpc.annotation.Codecs;
+
 public class RequestWrapper {
 	
 	private static AtomicInteger incId = new AtomicInteger(0);
@@ -20,7 +22,7 @@ public class RequestWrapper {
 	
 	private int id = 0;
 	
-	private int codecType = Codecs.JAVA_CODEC;
+	private int codecType = Codecs.JAVA_CODEC.ordinal();
 	
 	private int messageLen;
 

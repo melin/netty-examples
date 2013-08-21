@@ -10,8 +10,8 @@ package com.ustcinfo.rpc;
 public class HelloWorldImpl implements HelloWorld {
 
 	@Override
-	public String queryUser(String name) {
-		return "hello " + name;
+	public Result queryUser(User user) {
+		return new Result("hello " + user.getUsername());
 	}
 
 }

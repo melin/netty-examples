@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.ustcinfo.rpc.annotation.Codecs;
+
 public abstract class AbstractClientInvocationHandler implements InvocationHandler {
 
 	private List<InetSocketAddress> servers;
@@ -18,14 +20,14 @@ public abstract class AbstractClientInvocationHandler implements InvocationHandl
 	
 	private String targetInstanceName;
 	
-	private int codecType;
+	private Codecs codecType;
 	
 	// per method timeout,some special method use methodName.toLowerCase to set timeout,other use *
 	private Map<String, Integer> methodTimeouts;
 	
 	public AbstractClientInvocationHandler(List<InetSocketAddress> servers,int clientNums,int connectTimeout,
 										   String targetInstanceName,Map<String, Integer> methodTimeouts,
-										   int codecType){
+										   Codecs codecType){
 		this.servers = Collections.unmodifiableList(servers);
 		this.clientNums = clientNums;
 		this.connectTimeout = connectTimeout;

@@ -10,6 +10,9 @@ import java.lang.reflect.Proxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ustcinfo.rpc.annotation.Codecs;
+import com.ustcinfo.rpc.annotation.RpcMethod;
+import com.ustcinfo.rpc.annotation.RpcService;
 import com.ustcinfo.rpc.client.Client;
 import com.ustcinfo.rpc.netty4.Netty4ClientFactory;
 
@@ -19,6 +22,21 @@ import com.ustcinfo.rpc.netty4.Netty4ClientFactory;
  */
 public class RpcClientFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientFactory.class);
+	
+	/** 
+     * 引用服务, 连接超时时间 1000ms
+     *  
+     * @param <T> 接口泛型 
+     * @param interfaceClass 接口类型 
+     * @param host 服务器主机名 
+     * @param port 服务器端口
+     * @param timeout 连接超时时间，单位毫秒 
+     * @return 远程服务 
+     * @throws RpcException 
+     */  
+    public static <T> T refer(Class<T> interfaceClass, String host, int port) throws RpcException {  
+        return refer(interfaceClass, host, port, 1000); 
+    }  
 
 	/** 
      * 引用服务 
@@ -26,12 +44,13 @@ public class RpcClientFactory {
      * @param <T> 接口泛型 
      * @param interfaceClass 接口类型 
      * @param host 服务器主机名 
-     * @param port 服务器端口 
+     * @param port 服务器端口
+     * @param timeout 连接超时时间，单位毫秒 
      * @return 远程服务 
      * @throws RpcException 
      */  
     @SuppressWarnings("unchecked")  
-    public static <T> T refer(final Class<T> interfaceClass, final String host, final int port) throws RpcException {  
+    public static <T> T refer(Class<T> interfaceClass, String host, int port, int timeout) throws RpcException {  
         if (interfaceClass == null)  
             throw new IllegalArgumentException("Interface class == null");  
         if (! interfaceClass.isInterface())  
@@ -40,9 +59,12 @@ public class RpcClientFactory {
             throw new IllegalArgumentException("Host == null!");  
         if (port <= 0 || port > 65535)  
             throw new IllegalArgumentException("Invalid port " + port);  
+        if (timeout < 1000)
+        	timeout = 1000;
+        	
         LOGGER.info("Get remote service " + interfaceClass.getName() + " from server " + host + ":" + port);  
         
-        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[] {interfaceClass}, new JDKInvocationHandler(interfaceClass, host, port));  
+        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[] {interfaceClass}, new JDKInvocationHandler(interfaceClass, host, port, timeout));  
     }  
     
     private static class JDKInvocationHandler implements InvocationHandler {
@@ -50,10 +72,22 @@ public class RpcClientFactory {
     	
     	private Client client;
     	
-		public JDKInvocationHandler(Class<?> interfaceClass, String host, int port) {
+    	private int timeout = 1000;
+    	
+    	private Codecs encoder = Codecs.JAVA_CODEC;
+    	
+		public JDKInvocationHandler(Class<?> interfaceClass, String host, int port, int timeout) {
 			this.interfaceClass = interfaceClass;
+			RpcService rpcService = interfaceClass.getAnnotation(RpcService.class);
+			
+			if(rpcService != null) {
+				if(rpcService.timeout() > 1000)
+					timeout = rpcService.timeout();
+				encoder = rpcService.encoder();
+			}
+			
 			try {
-				client = Netty4ClientFactory.getInstance().get(host, port, 2000);
+				client = Netty4ClientFactory.getInstance().get(host, port, timeout);
 			} catch (Exception e) {
 				throw new RpcException(e.getMessage(), e);
 			}
@@ -62,7 +96,15 @@ public class RpcClientFactory {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] arguments)
 				throws Throwable {
-			return client.invokeSync(interfaceClass.getName(), method.getName(), method.getParameterTypes(), arguments, 10000, Codecs.JAVA_CODEC);
+			RpcMethod rpcMethod = method.getAnnotation(RpcMethod.class);
+			
+			if(rpcMethod != null) {
+				if(rpcMethod.timeout() > 1000)
+					timeout = rpcMethod.timeout();
+			}
+			
+			Object result = client.invokeSync(interfaceClass.getName(), method.getName(), method.getParameterTypes(), arguments, timeout, encoder);
+			return result;
 		}
     	
     }

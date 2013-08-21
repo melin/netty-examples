@@ -60,8 +60,7 @@ public class Netty4ServerHandler extends SimpleChannelInboundHandler<Object> {
 			public void operationComplete(ChannelFuture future)
 					throws Exception {
 				if (!future.isSuccess()) {
-					LOGGER.error("server write response error,request id is: "
-							+ id);
+					LOGGER.error("server write response error,request id is: " + id);
 				}
 			}
 		});

@@ -7,9 +7,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.ustcinfo.rpc.Codecs;
 import com.ustcinfo.rpc.RequestWrapper;
 import com.ustcinfo.rpc.ResponseWrapper;
+import com.ustcinfo.rpc.annotation.Codecs;
 
 public abstract class AbstractClient implements Client {
 
@@ -20,20 +20,20 @@ public abstract class AbstractClient implements Client {
 	private static final boolean isWarnEnabled = LOGGER.isWarnEnabled();
 
 	private static final long PRINT_CONSUME_MINTIME = Long.parseLong(System
-			.getProperty("nfs.rpc.print.consumetime", "0"));
+			.getProperty("rpc.print.consumetime", "0"));
 
 	protected static ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>> responses = 
 			new ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>>();
 	
 	public Object invokeSync(String targetInstanceName, String methodName,
-			Class<?>[] argTypes, Object[] args, int timeout, int codecType)
+			Class<?>[] argTypes, Object[] args, int timeout, Codecs codecType)
 			throws Exception {
 		byte[][] argTypeBytes = new byte[argTypes.length][];
 		for(int i =0; i < argTypes.length; i++) {
 		    argTypeBytes[i] =  argTypes[i].getName().getBytes();
 		}
 		RequestWrapper wrapper = new RequestWrapper(targetInstanceName.getBytes(),
-				methodName.getBytes(), argTypeBytes, args, timeout, codecType);
+				methodName.getBytes(), argTypeBytes, args, timeout, codecType.ordinal());
 		return invokeSyncIntern(wrapper);
 	}
 

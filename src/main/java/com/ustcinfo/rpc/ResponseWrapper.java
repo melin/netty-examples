@@ -1,5 +1,7 @@
 package com.ustcinfo.rpc;
 
+import com.ustcinfo.rpc.annotation.Codecs;
+
 public class ResponseWrapper {
 
 	private int requestId = 0;
@@ -10,7 +12,7 @@ public class ResponseWrapper {
 	
 	private Throwable exception = null;
 	
-	private int codecType = Codecs.HESSIAN_CODEC;
+	private int codecType = Codecs.JAVA_CODEC.ordinal();
 	
 	private int messageLen;
 	

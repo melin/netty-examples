@@ -1,10 +1,5 @@
 package com.ustcinfo.rpc.server;
-/**
- * nfs-rpc
- *   Apache License
- *   
- *   http://code.google.com/p/nfs-rpc (c) 2011
- */
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,14 +7,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ustcinfo.rpc.Codecs;
 import com.ustcinfo.rpc.RequestWrapper;
 import com.ustcinfo.rpc.ResponseWrapper;
-/**
- * Reflection RPC Server Handler 
- * 
- * @author <a href="mailto:bluedavy@gmail.com">bluedavy</a>
- */
+import com.ustcinfo.rpc.annotation.Codecs;
+
 public class RPCServerHandler implements ServerHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RPCServerHandler.class);

@@ -12,9 +12,9 @@ public class ClientTest {
 		try {
 			HelloWorld helloWorld = RpcClientFactory.refer(HelloWorld.class, "localhost", 8080);
 			
-			String result = helloWorld.queryUser("hello"); 
+			Result result = helloWorld.queryUser(new User("melin")); 
 			
-			System.out.println(result);
+			System.out.println(result.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

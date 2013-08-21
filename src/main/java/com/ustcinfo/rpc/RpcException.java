@@ -8,6 +8,7 @@ package com.ustcinfo.rpc;
  * 
  * @author bsli@ustcinfo.com
  */
+@SuppressWarnings("serial")
 public class RpcException extends RuntimeException {
 	public RpcException() {
 		super();

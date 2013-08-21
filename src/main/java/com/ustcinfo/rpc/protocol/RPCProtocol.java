@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.ustcinfo.rpc.Codecs;
 import com.ustcinfo.rpc.RequestWrapper;
 import com.ustcinfo.rpc.ResponseWrapper;
+import com.ustcinfo.rpc.annotation.Codecs;
 
 /**
  * Common RPC Protocol
@@ -170,16 +170,9 @@ public class RPCProtocol implements Protocol {
 			byteBuffer.writeByte((byte)0);
 			byteBuffer.writeByte((byte)0);
 			byteBuffer.writeInt(id);
-			if(wrapper.getCodecType() == Codecs.PB_CODEC){
-				byteBuffer.writeInt(className.length);
-			}
-			else{
-				byteBuffer.writeInt(0);
-			}
+			byteBuffer.writeInt(className.length);
 			byteBuffer.writeInt(body.length);
-			if(wrapper.getCodecType() == Codecs.PB_CODEC){
-				byteBuffer.writeBytes(className);
-			}
+			byteBuffer.writeBytes(className);
 			byteBuffer.writeBytes(body);
 			return byteBuffer;
 		}
@@ -276,10 +269,8 @@ public class RPCProtocol implements Protocol {
             	}
             	
             	byte[] classNameBytes = null;
-            	if(codecType == Codecs.PB_CODEC){	
-	            	classNameBytes = new byte[classNameLen];
-	            	wrapper.readBytes(classNameBytes);
-            	}
+            	classNameBytes = new byte[classNameLen];
+            	wrapper.readBytes(classNameBytes);
 
             	byte[] bodyBytes = new byte[bodyLen];
             	wrapper.readBytes(bodyBytes);

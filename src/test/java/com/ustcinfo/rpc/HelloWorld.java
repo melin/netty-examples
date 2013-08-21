@@ -8,5 +8,5 @@ package com.ustcinfo.rpc;
  * @author bsli@ustcinfo.com
  */
 public interface HelloWorld {
-	public String queryUser(String name);
+	public Result queryUser(User user);
 }
