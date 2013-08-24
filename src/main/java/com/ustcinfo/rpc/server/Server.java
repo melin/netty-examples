@@ -1,15 +1,5 @@
 package com.ustcinfo.rpc.server;
-/**
- * nfs-rpc
- *   Apache License
- *   
- *   http://code.google.com/p/nfs-rpc (c) 2011
- */
-/**
- * RPC Server Interface
- * 
- * @author <a href="mailto:bluedavy@gmail.com">bluedavy</a>
- */
+
 public interface Server {
 
 	/**

@@ -45,15 +45,12 @@ public class Netty4Server implements Server {
 		ServerBootstrap b = new ServerBootstrap();
 		b.group(bossGroup, ioGroup).channel(NioServerSocketChannel.class)
 		        .childOption(ChannelOption.TCP_NODELAY, 
-		                     Boolean.parseBoolean(System.getProperty(
-		                             "rpc.tcp.nodelay", "true")))
+		        		Boolean.parseBoolean(System.getProperty("rpc.tcp.nodelay", "true")))
 		        .childOption(ChannelOption.SO_REUSEADDR, 
-		                     Boolean.parseBoolean(System.getProperty(
-		                             "rpc.tcp.reuseaddress", "true")))
+		        		Boolean.parseBoolean(System.getProperty("rpc.tcp.reuseaddress", "true")))
 		        .childHandler(new ChannelInitializer<SocketChannel>() {
 			        @Override
-			        public void initChannel(SocketChannel ch)
-			                throws Exception {
+			        public void initChannel(SocketChannel ch) throws Exception {
 						ch.pipeline().addLast("decoder", new Netty4ProtocolDecoder());
 						ch.pipeline().addLast("encoder", new Netty4ProtocolEncoder());
 						ch.pipeline().addLast(businessGroup, "handler", new Netty4ServerHandler());
