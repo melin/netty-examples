@@ -4,7 +4,7 @@ netty-examples
 是基于netty4开发的应用实例：
 
 - rpc server和client的实现
-- nettyclient简化netty client的应用（未实现）
+- netty4client简化netty client的应用
 
 RPC HelloWorld 实例
 -------------------
