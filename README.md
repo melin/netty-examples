@@ -4,7 +4,7 @@ netty-examples
 是基于netty4开发的应用实例：
 
 - rpc server和client的实现
-- netty4client简化netty client的应用
+- Netty4Client简化netty client的应用，实现自动重连功能
 
 RPC HelloWorld 实例
 -------------------
@@ -58,6 +58,25 @@ public class ClientTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+}
+```
+
+Netty4Client 实例
+-------------------
+
+```java
+public class DiamondClient {
+	public static void main(String[] args) throws Exception {
+		Netty4Client client = new Netty4Client("localhost", 8080, new ClientChannelInitializer());
+		
+		while(client.isConnected()) {
+			System.out.println(client.receiveMessage());
+		}
+		
+		System.out.println("=============");
+		
+		client.close();
 	}
 }
 ```
